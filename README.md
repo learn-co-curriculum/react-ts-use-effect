@@ -30,7 +30,7 @@ components:
 When we think about the functionality of a function, we generally think about
 its return value. However, functions can also have **side effects**:
 
-> an operation, function or expression is said to have a side effect if it
+> An operation, function or expression is said to have a side effect if it
 > modifies some state variable value(s) outside its local environment, that is
 > to say has an observable effect besides returning a value (the main effect) to
 > the invoker of the operation. — [Wikipedia on Side Effects][side-effects]
@@ -62,7 +62,7 @@ to use another special **hook** from React: `useEffect`.
 To use the `useEffect` hook, we must first import it:
 
 ```jsx
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 ```
 
 Then, inside our component, we call `useEffect` and pass in a **callback
@@ -146,6 +146,11 @@ component re-renders**.
 render -> useEffect -> setState -> re-render -> useEffect
 ```
 
+> **TypeScript Note**: You may have noticed in the above example we did not have
+> to type our `e` event parameter in the `onChange` anonymous function. When
+> defining functions _inline_ on these event listener attributes, TypeScript is
+> able to infer the first parameter passed to it is an event.
+
 ## useEffect Dependencies
 
 Sometimes we only want to run our side effect in certain conditions. For
@@ -162,10 +167,11 @@ function DogPics() {
   const [images, setImages] = useState([]);
 
   useEffect(() => {
+    console.log("useEffect");
     fetch("https://dog.ceo/api/breeds/image/random/3")
       .then((r) => r.json())
-      .then((data) => {
-        // setting state in the useEffect callback
+      .then((data: DogData) => {
+        console.log("setState");
         setImages(data.message);
       });
   });
@@ -222,9 +228,10 @@ as well:
 
 ```jsx
 useEffect(() => {
+  console.log("useEffect");
   fetch("https://dog.ceo/api/breeds/image/random/3")
     .then((r) => r.json())
-    .then((data) => {
+    .then((data: DogData) => {
       setImages(data.message);
     });
 }, []);
@@ -235,6 +242,12 @@ In this example, our component rendering cycle now looks like this:
 ```txt
 render -> useEffect -> setImages -> render
 ```
+
+> **TypeScript Note**: You may have noticed the `DogData` type being used in our
+> examples. That is a type interface we defined at the top of the `DogPics.tsx`
+> file. How did we figure out how to type the data being returned? We console
+> logged it first to view what was being sent to us, then created the interface
+> based off that.
 
 ## Performing Side Effects
 
