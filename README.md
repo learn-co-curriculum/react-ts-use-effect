@@ -4,7 +4,8 @@
 
 - Understand side effects in programming
 - Use the `useEffect` hook to write side effects in components
-- Control when the side effects run by using a dependencies array with `useEffect`
+- Control when the side effects run by using a dependencies array with
+  `useEffect`
 
 ## Introduction
 
@@ -19,8 +20,8 @@ components:
 
 - A **component** is a function that takes in **props** and returns **JSX**
 - When we call `ReactDOM.render` and pass in our components, it will **render**
-  all of our components by calling our component functions, passing down
-  props, and building the DOM elements out of our components' JSX
+  all of our components by calling our component functions, passing down props,
+  and building the DOM elements out of our components' JSX
 - When a React app's **state** is updated by calling the `setState` function,
   React will **re-render** the component, along with all of its children
 
@@ -29,7 +30,7 @@ components:
 When we think about the functionality of a function, we generally think about
 its return value. However, functions can also have **side effects**:
 
-> an operation, function or expression is said to have a side effect if it
+> An operation, function or expression is said to have a side effect if it
 > modifies some state variable value(s) outside its local environment, that is
 > to say has an observable effect besides returning a value (the main effect) to
 > the invoker of the operation. — [Wikipedia on Side Effects][side-effects]
@@ -41,8 +42,8 @@ database, writing to the file system, etc. are common examples of side effects
 in programming.
 
 In terms of a React component, the **main effect** of the component is to return
-some JSX. That's been true with all of the components we've been working with! One
-of the first rules we learned about function components is that they take in
+some JSX. That's been true with all of the components we've been working with!
+One of the first rules we learned about function components is that they take in
 props, and return JSX.
 
 _However_, it's often necessary for a component to perform some **side effects**
@@ -61,7 +62,7 @@ to use another special **hook** from React: `useEffect`.
 To use the `useEffect` hook, we must first import it:
 
 ```jsx
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 ```
 
 Then, inside our component, we call `useEffect` and pass in a **callback
@@ -98,8 +99,8 @@ component is rendered.
 
 > By using this Hook, you tell React that your component needs to do something
 > after render. React will remember the function you passed (we'll refer to it
-> as our "effect"), and call it later after performing the DOM updates.
-> — [React docs on the useEffect hook][use-effect-hook]
+> as our "effect"), and call it later after performing the DOM updates. — [React
+> docs on the useEffect hook][use-effect-hook]
 
 Let's add some state into the equation, and see how re-rendering the component
 by updating state interacts with our `useEffect` hook:
@@ -145,6 +146,11 @@ component re-renders**.
 render -> useEffect -> setState -> re-render -> useEffect
 ```
 
+> **TypeScript Note**: You may have noticed in the above example we did not have
+> to type our `e` event parameter in the `onChange` anonymous function. When
+> defining functions _inline_ on these event listener attributes, TypeScript is
+> able to infer the first parameter passed to it is an event.
+
 ## useEffect Dependencies
 
 Sometimes we only want to run our side effect in certain conditions. For
@@ -161,10 +167,11 @@ function DogPics() {
   const [images, setImages] = useState([]);
 
   useEffect(() => {
+    console.log("useEffect");
     fetch("https://dog.ceo/api/breeds/image/random/3")
       .then((r) => r.json())
-      .then((data) => {
-        // setting state in the useEffect callback
+      .then((data: DogData) => {
+        console.log("setState");
         setImages(data.message);
       });
   });
@@ -221,9 +228,10 @@ as well:
 
 ```jsx
 useEffect(() => {
+  console.log("useEffect");
   fetch("https://dog.ceo/api/breeds/image/random/3")
     .then((r) => r.json())
-    .then((data) => {
+    .then((data: DogData) => {
       setImages(data.message);
     });
 }, []);
@@ -235,6 +243,12 @@ In this example, our component rendering cycle now looks like this:
 render -> useEffect -> setImages -> render
 ```
 
+> **TypeScript Note**: You may have noticed the `DogData` type being used in our
+> examples. That is a type interface we defined at the top of the `DogPics.tsx`
+> file. How did we figure out how to type the data being returned? We console
+> logged it first to view what was being sent to us, then created the interface
+> based off that.
+
 ## Performing Side Effects
 
 Running a `fetch` request as a side effect is one great example of when you'd
@@ -243,10 +257,10 @@ lessons. For now, let's take a look at a couple of other examples where you
 might use the `useEffect` hook.
 
 One kind of side effect we can demonstrate here is _updating parts of the
-webpage outside of the React DOM tree_. React is responsible for all the
-DOM elements rendered by our components, but there are some parts of the webpage
-that live outside of this tree. Take, for instance, the `<title>` of our page
-— this is what shows up in the browser tab, like this:
+webpage outside of the React DOM tree_. React is responsible for all the DOM
+elements rendered by our components, but there are some parts of the webpage
+that live outside of this tree. Take, for instance, the `<title>` of our page —
+this is what shows up in the browser tab, like this:
 
 ![title](https://curriculum-content.s3.amazonaws.com/phase-2/react-hooks-use-effect/title.png)
 
@@ -329,7 +343,8 @@ when your side effect code will run:
     props change)
 - `useEffect(() => {}, [])`: Empty dependencies array
   - Run the side effect **only the first time our component renders**
-- `useEffect(() => {}, [variable1, variable2])`: Dependencies array with elements in it
+- `useEffect(() => {}, [variable1, variable2])`: Dependencies array with
+  elements in it
   - Run the side effect **any time the variable(s) change**
 
 Or, to put it another way:
@@ -340,14 +355,15 @@ Or, to put it another way:
 
 So far, we've been working with components solely for rendering to the DOM based
 on JSX, and updating based on changes to state. It's also useful to introduce
-**side effects** to our components so that we can interact with the world outside
-of the React DOM tree and do things like making network requests or setting
-timers.
+**side effects** to our components so that we can interact with the world
+outside of the React DOM tree and do things like making network requests or
+setting timers.
 
 ## Resources
 
 - [React Docs on useEffect][use-effect-hook]
 - [A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)
 
-[side-effects]: https://en.wikipedia.org/wiki/Side_effect_(computer_science)#:~:text=In%20computer%20science%2C%20an%20operation,the%20invoker%20of%20the%20operation.
+[side-effects]:
+  https://en.wikipedia.org/wiki/Side_effect_(computer_science)#:~:text=In%20computer%20science%2C%20an%20operation,the%20invoker%20of%20the%20operation.
 [use-effect-hook]: https://reactjs.org/docs/hooks-effect.html
